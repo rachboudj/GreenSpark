@@ -74,4 +74,32 @@ class UserController extends Controller
     
     return view('dashboard.index', compact('user', 'projects', 'contributions'));
 }
+
+// Ajoutez cette méthode dans votre UserController.php
+
+/**
+ * Afficher la liste des projets de l'utilisateur connecté
+ */
+public function myProjects()
+{
+    $user = auth()->user();
+    
+    // Récupérez les projets de l'utilisateur, triés par date de création décroissante
+    $projects = $user->projects()->with('category')->latest()->get();
+    
+    return view('dashboard.my-projects', compact('user', 'projects'));
+}
+
+/**
+ * Afficher la liste des contributions de l'utilisateur connecté
+ */
+public function myContributions()
+{
+    $user = auth()->user();
+    
+    // Récupérez les contributions de l'utilisateur, avec les projets associés
+    $contributions = $user->contributions()->with('project.user', 'project.category')->latest()->get();
+    
+    return view('dashboard.my-contributions', compact('user', 'contributions'));
+}
 }
