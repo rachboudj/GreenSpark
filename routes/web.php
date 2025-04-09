@@ -33,3 +33,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('my-projects', [ProjectController::class, 'myProjects'])->name('my-projects');
     Route::get('my-contributions', [ContributionController::class, 'myContributions'])->name('my-contributions');
 });
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
