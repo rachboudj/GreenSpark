@@ -61,4 +61,17 @@ class UserController extends Controller
     {
         //
     }
+
+    public function dashboard()
+{
+    $user = auth()->user();
+    
+    // Récupérez les projets de l'utilisateur
+    $projects = $user->projects()->latest()->get();
+    
+    // Récupérez les contributions de l'utilisateur
+    $contributions = $user->contributions()->with('project')->latest()->get();
+    
+    return view('dashboard.index', compact('user', 'projects', 'contributions'));
+}
 }
