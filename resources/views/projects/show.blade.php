@@ -1,125 +1,170 @@
 @extends('layouts.app')
 
-@section('title', $project->title . ' | Green Spark')
-
 @section('content')
 <div class="container">
-    <div class="row">
-        <div class="col-md-8">
-            @if($project->cover_image)
-                <img src="{{ asset('storage/' . $project->cover_image) }}" class="img-fluid rounded mb-4" alt="{{ $project->title }}">
-            @endif
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
-            <h1>{{ $project->title }}</h1>
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <div class="row">
+        <!-- Colonne principale avec les infos du projet -->
+        <div class="col-lg-8">
+            <h1 class="mb-3">{{ $project->title }}</h1>
             
             <div class="d-flex mb-3">
-                <span class="badge bg-secondary me-2">{{ $project->category->name }}</span>
-                <span class="badge bg-info me-2">{{ $project->region }}</span>
-                <span class="badge bg-{{ $project->status == 'active' ? 'success' : ($project->status == 'funded' ? 'primary' : 'secondary') }}">
-                    {{ ucfirst($project->status) }}
-                </span>
+                <span class="badge bg-primary me-2">{{ $project->category->name }}</span>
+                <span class="text-muted">Créé par {{ $project->user->name }} {{ $project->created_at->diffForHumans() }}</span>
             </div>
-
-            <div class="mb-4">
-                <h5>Description</h5>
-                <p>{{ $project->short_description }}</p>
-                <div class="mt-3">
-                    {!! nl2br(e($project->description)) !!}
+            
+            <!-- Image principale -->
+            @if($project->cover_image)
+                <div class="mb-4">
+                    <img src="{{ asset('storage/' . $project->cover_image) }}" alt="{{ $project->title }}" class="img-fluid rounded">
+                </div>
+            @endif
+            
+            <!-- Description du projet -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">Description du projet</h3>
+                    <p class="lead mb-3">{{ $project->short_description }}</p>
+                    <div class="project-description">
+                        {!! nl2br(e($project->description)) !!}
+                    </div>
                 </div>
             </div>
-
+            
+            <!-- Galerie d'images -->
             @if($project->media->count() > 0)
-                <div class="mb-4">
-                    <h5>Galerie média</h5>
-                    <div class="row">
-                        @foreach($project->media as $media)
-                            <div class="col-md-4 mb-3">
-                                @if($media->media_type == 'image')
-                                    <img src="{{ asset('storage/' . $media->file_path) }}" class="img-fluid rounded" alt="Image du projet">
-                                @elseif($media->media_type == 'video')
-                                    <div class="ratio ratio-16x9">
-                                        <iframe src="{{ $media->file_path }}" allowfullscreen></iframe>
-                                    </div>
-                                @endif
-                            </div>
-                        @endforeach
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title">Galerie</h3>
+                        <div class="row">
+                            @foreach($project->media as $media)
+                                <div class="col-md-4 mb-3">
+                                    <a href="{{ asset('storage/' . $media->file_path) }}" data-lightbox="project-gallery" data-title="{{ $project->title }}">
+                                        <img src="{{ asset('storage/' . $media->file_path) }}" alt="Image du projet" class="img-fluid rounded">
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             @endif
-
-            <div class="mb-4">
-                <h5>Créateur du projet</h5>
-                <p>{{ $project->user->name }}</p>
-            </div>
-
-            <div class="mb-4">
-                <h5>Période de financement</h5>
-                <p>Du {{ $project->start_date->format('d/m/Y') }} au {{ $project->end_date->format('d/m/Y') }}</p>
-            </div>
+            
+            <!-- Actions du créateur du projet -->
+            @if(auth()->check() && auth()->id() === $project->user_id)
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title">Actions du créateur</h3>
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('projects.edit', $project->slug) }}" class="btn btn-primary">Modifier le projet</a>
+                            
+                            <form action="{{ route('projects.destroy', $project->slug) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce projet ?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Supprimer le projet</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            
+            <!-- Liste des contributions -->
+            @if($project->contributions->count() > 0)
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title">Contributions ({{ $project->contributions->count() }})</h3>
+                        <ul class="list-group">
+                            @foreach($project->contributions->sortByDesc('created_at') as $contribution)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ $contribution->user->name }}</strong> a contribué
+                                        <span class="badge bg-success">{{ number_format($contribution->amount, 0, ',', ' ') }} €</span>
+                                    </div>
+                                    <small class="text-muted">{{ $contribution->created_at->diffForHumans() }}</small>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
         </div>
-
-        <div class="col-md-4">
-            <div class="card mb-4">
+        
+        <!-- Sidebar avec les infos de financement et actions -->
+        <div class="col-lg-4">
+            <div class="card mb-4 sticky-top" style="top: 20px; z-index: 1;">
                 <div class="card-body">
-                    <h5 class="card-title">Financement</h5>
+                    <h3 class="card-title">Financement</h3>
+                    
+                    <div class="d-flex justify-content-between mb-1">
+                        <span><strong>{{ number_format($project->current_amount, 0, ',', ' ') }} €</strong> récoltés</span>
+                        <span>sur {{ number_format($project->funding_goal, 0, ',', ' ') }} €</span>
+                    </div>
                     
                     <div class="progress mb-3">
-                        @php $percentage = ($project->current_amount / $project->funding_goal) * 100; @endphp
-                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ $percentage }}%">
-                            {{ number_format($percentage, 0) }}%
-                        </div>
+                        <div class="progress-bar" role="progressbar" style="width: {{ $progressPercentage }}%;" aria-valuenow="{{ $progressPercentage }}" aria-valuemin="0" aria-valuemax="100">{{ round($progressPercentage) }}%</div>
                     </div>
                     
                     <div class="d-flex justify-content-between mb-3">
-                        <span><strong>{{ number_format($project->current_amount, 0) }} €</strong> récoltés</span>
-                        <span>Objectif: {{ number_format($project->funding_goal, 0) }} €</span>
-                    </div>
-
-                    <p>Soutenu par {{ $project->contributions->count() }} contributeurs</p>
-                    
-                    @if($project->status === 'active')
-                        <p>
-                            @php 
-                                $daysLeft = now()->diffInDays($project->end_date, false);
-                            @endphp
+                        <div>
+                            <i class="bi bi-people"></i> {{ $project->contributions->count() }} contributeur(s)
+                        </div>
+                        <div>
                             @if($daysLeft > 0)
-                                <strong>{{ $daysLeft }}</strong> jours restants
-                            @elseif($daysLeft == 0)
-                                <strong>Dernier jour</strong> pour contribuer
+                                <i class="bi bi-clock"></i> {{ $daysLeft }} jours restants
                             @else
-                                Campagne terminée
+                                <i class="bi bi-calendar-check"></i> Campagne terminée
                             @endif
-                        </p>
-
-                        @if($daysLeft >= 0)
-                            <form action="{{ route('contributions.store', $project->id) }}" method="POST">
-                                @csrf
-                                <div class="mb-3">
-                                    <label for="amount" class="form-label">Montant de la contribution (€)</label>
-                                    <input type="number" class="form-control" id="amount" name="amount" min="1" step="1" required>
-                                    @error('amount')
-                                        <div class="text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <button type="submit" class="btn btn-success w-100">Contribuer</button>
-                            </form>
-                        @endif
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="bi bi-geo-alt"></i> {{ $project->region }}
+                        </small>
+                    </div>
+                    
+                    @if($project->isActive())
+                        <div class="d-grid gap-2">
+                            <a href="{{ route('contributions.create', $project->slug) }}" class="btn btn-success btn-lg">
+                                <i class="bi bi-heart"></i> Contribuer à ce projet
+                            </a>
+                        </div>
+                    @elseif($project->end_date->isPast())
+                        <div class="alert alert-secondary mb-0">
+                            <i class="bi bi-info-circle"></i> Cette campagne est terminée
+                            @if($project->isGoalReached())
+                                <strong>et a atteint son objectif !</strong>
+                            @else
+                                <strong>sans avoir atteint son objectif.</strong>
+                            @endif
+                        </div>
                     @else
-                        <div class="alert alert-secondary">
-                            Ce projet n'accepte plus de contributions.
+                        <div class="alert alert-secondary mb-0">
+                            <i class="bi bi-info-circle"></i> Cette campagne n'est plus active.
                         </div>
                     @endif
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Partager ce projet</h5>
-                    <div class="d-flex justify-content-around mt-3">
-                        <a href="#" class="btn btn-outline-primary"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="btn btn-outline-info"><i class="bi bi-twitter"></i></a>
-                        <a href="#" class="btn btn-outline-success"><i class="bi bi-envelope"></i></a>
-                        <a href="#" class="btn btn-outline-dark"><i class="bi bi-link-45deg"></i></a>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary" type="button">
+                            <i class="bi bi-share"></i> Partager ce projet
+                        </button>
+                        <a href="{{ route('projects.index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Voir tous les projets
+                        </a>
                     </div>
                 </div>
             </div>

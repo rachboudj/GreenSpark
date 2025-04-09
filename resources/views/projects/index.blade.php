@@ -21,11 +21,15 @@
         <div class="col-md-4">
             <select name="category" class="form-select" onchange="this.form.submit()">
                 <option value="">Toutes les catégories</option>
-                @foreach($categories as $category)
-                    <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-                        {{ $category->name }}
-                    </option>
-                @endforeach
+                @if(isset($categories) && $categories->count() > 0)
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
+                                @else
+                                    <option value="" disabled>Aucune catégorie disponible</option>
+                                @endif
             </select>
         </div>
     </div>
@@ -59,7 +63,7 @@
                         </div>
                     </div>
                     <div class="card-footer bg-white">
-                        <a href="{{ route('projects.show', $project) }}" class="btn btn-sm btn-primary">Voir le projet</a>
+                        <a href="{{ route('projects.show', $project->slug) }}" class="btn btn-sm btn-primary">Voir le projet</a>
                     </div>
                 </div>
             </div>
