@@ -22,10 +22,20 @@ Route::get('/projects/{slug}', [ProjectController::class, 'show'])->name('projec
 Route::get('/projects/{slug}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
 Route::put('/projects/{slug}', [ProjectController::class, 'update'])->name('projects.update');
 Route::delete('/projects/{slug}', [ProjectController::class, 'destroy'])->name('projects.destroy');
-Route::delete('/project-media/{id}', [ProjectController::class, 'deleteMedia'])->name('project-media.destroy');
+// Route::delete('/project-media/{id}', [ProjectController::class, 'deleteMedia'])->name('project-media.destroy');
+Route::delete('/project-media/{id}', [App\Http\Controllers\ProjectMediaController::class, 'destroy'])->name('projects.media.delete');
 
 // Routes pour les catégories
 Route::get('/category/{id}', [ProjectController::class, 'byCategory'])->name('projects.category');
+
+// Routes pour le tableau de bord admin
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\AdminController::class, 'index'])->name('dashboard');
+    Route::delete('/projects/{id}', [App\Http\Controllers\AdminController::class, 'deleteProject'])->name('delete-project');
+    Route::patch('/projects/{id}/status', [App\Http\Controllers\AdminController::class, 'updateProjectStatus'])->name('update-project-status');
+    Route::get('/users', [App\Http\Controllers\AdminController::class, 'users'])->name('users');
+    Route::patch('/users/{id}/role', [App\Http\Controllers\AdminController::class, 'updateUserRole'])->name('update-user-role');
+});
 
 // Routes pour le tableau de bord utilisateur
 Route::get('/my-projects', [UserController::class, 'myProjects'])->name('my-projects');
