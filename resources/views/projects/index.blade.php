@@ -44,7 +44,14 @@
                         </div>
                     @endif
                     <div class="card-body">
-                        <span class="badge bg-secondary mb-2">{{ $project->category->name }}</span>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="badge bg-secondary">{{ $project->category->name }}</span>
+                        @if($project->status == 'funded')
+                            <span class="badge bg-success">Financé</span>
+                        @elseif($project->status == 'active')
+                            <span class="badge bg-primary">Actif</span>
+                        @endif
+                    </div>
                         <h5 class="card-title">{{ $project->title }}</h5>
                         <p class="card-text">{{ $project->short_description }}</p>
                         
