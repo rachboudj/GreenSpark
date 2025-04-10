@@ -122,7 +122,7 @@
                         </div>
                         <div>
                             @if($daysLeft > 0)
-                                <i class="bi bi-clock"></i> {{ $daysLeft }} jours restants
+                            <i class="bi bi-clock"></i> {{ floor($daysLeft) }} jour{{ floor($daysLeft) > 1 ? 's' : '' }} restant{{ floor($daysLeft) > 1 ? 's' : '' }}
                             @else
                                 <i class="bi bi-calendar-check"></i> Campagne terminée
                             @endif

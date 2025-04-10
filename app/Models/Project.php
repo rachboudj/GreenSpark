@@ -104,7 +104,10 @@ class Project extends Model
      */
     public function daysLeft()
     {
-        return now()->diffInDays($this->end_date, false);
+return floor(now()->diffInDays($this->end_date, false));
+    
+$days = now()->diffInDays($this->end_date, false);
+return floor($days);
     }
 
     /**
