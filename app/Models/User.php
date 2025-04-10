@@ -57,4 +57,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Contribution::class);
     }
+
+    // Dans app/Models/User.php
+public function isAdmin()
+{
+    return $this->role === 'Admin';
+}
 }
