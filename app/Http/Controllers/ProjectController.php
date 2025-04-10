@@ -23,9 +23,12 @@ class ProjectController extends Controller
     /**
      * Afficher la liste des projets
      */
-    public function index(Request $request)
+public function index(Request $request)
 {
     $query = Project::with('category', 'user');
+    
+    // Filtrer pour n'afficher que les projets actifs ou financés
+    $query->whereIn('status', ['active', 'funded']);
     
     // Recherche par mot-clé
     if ($request->has('search') && !empty($request->search)) {
