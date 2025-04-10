@@ -100,14 +100,14 @@
                             <small class="text-muted">Format recommandé : JPG ou PNG, taille max : 2 Mo</small>
                         </div>
                         
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <label for="media" class="form-label">Images supplémentaires</label>
                             <input type="file" class="form-control @error('media.*') is-invalid @enderror" id="media" name="media[]" accept="image/*" multiple>
                             @error('media.*')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                             <small class="text-muted">Vous pouvez sélectionner plusieurs fichiers (max 5 recommandé). Taille max par fichier : 2 Mo</small>
-                        </div>
+                        </div> -->
                         
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
