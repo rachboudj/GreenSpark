@@ -23,15 +23,34 @@ class ProjectController extends Controller
     /**
      * Afficher la liste des projets
      */
-    public function index()
-    {
-        $categories = ProjectCategory::all();
-        $projects = Project::with('category', 'user')
-                          ->latest()
-                          ->paginate(12);
-        
-        return view('projects.index', compact('projects', 'categories'));
+    public function index(Request $request)
+{
+    $query = Project::with('category', 'user');
+    
+    // Recherche par mot-clé
+    if ($request->has('search') && !empty($request->search)) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+              ->orWhere('short_description', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%")
+              ->orWhere('region', 'like', "%{$search}%");
+        });
     }
+    
+    // Filtre par catégorie
+    if ($request->has('category') && !empty($request->category)) {
+        $query->where('category_id', $request->category);
+    }
+    
+    // Récupération des projets
+    $projects = $query->latest()->paginate(12);
+    
+    // Récupération des catégories pour le filtre
+    $categories = ProjectCategory::all();
+    
+    return view('projects.index', compact('projects', 'categories'));
+}
 
     /**
      * Afficher le formulaire de création de projet

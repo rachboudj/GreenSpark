@@ -12,26 +12,24 @@
     </div>
 
     <div class="row mb-4">
-        <div class="col-md-8">
-            <form action="{{ route('projects.index') }}" method="GET" class="d-flex">
-                <input type="text" name="search" class="form-control me-2" placeholder="Rechercher un projet..." value="{{ request('search') }}">
-                <button type="submit" class="btn btn-outline-primary">Rechercher</button>
-            </form>
-        </div>
-        <div class="col-md-4">
-            <select name="category" class="form-select" onchange="this.form.submit()">
-                <option value="">Toutes les catégories</option>
-                @if(isset($categories) && $categories->count() > 0)
-                                    @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                            {{ $category->name }}
-                                        </option>
-                                    @endforeach
-                                @else
-                                    <option value="" disabled>Aucune catégorie disponible</option>
-                                @endif
-            </select>
-        </div>
+        <form action="{{ route('projects.index') }}" method="GET" class="row">
+            <div class="col-md-8">
+                <div class="d-flex">
+                    <input type="text" name="search" class="form-control me-2" placeholder="Rechercher un projet..." value="{{ request('search') }}">
+                    <button type="submit" class="btn btn-outline-primary">Rechercher</button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select name="category" class="form-select" onchange="this.form.submit()">
+                    <option value="">Toutes les catégories</option>
+                    @foreach($categories ?? [] as $category)
+                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </form>
     </div>
 
     <div class="row">
@@ -82,7 +80,7 @@
     </div>
 
     <div class="mt-4">
-        {{ $projects->links() }}
+        {{ $projects->appends(request()->query())->links() }}
     </div>
 </div>
 @endsection
