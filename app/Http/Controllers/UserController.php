@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -61,6 +62,46 @@ class UserController extends Controller
     {
         //
     }
+
+    /**
+ * Afficher la liste des utilisateurs
+ */
+public function users()
+{
+    // Vérifier si l'utilisateur est admin
+    if (auth()->user()->role !== 'Admin') {
+        return redirect()->route('home')->with('error', 'Vous n\'avez pas les permissions nécessaires.');
+    }
+    
+    $users = User::withCount('projects')
+                ->orderBy('created_at', 'desc')
+                ->get();
+    
+    return view('dashboard.users', compact('users'));
+}
+
+/**
+ * Changer le rôle d'un utilisateur
+ */
+public function updateUserRole(Request $request, $id)
+{
+    // Vérifier si l'utilisateur est admin
+    if (auth()->user()->role !== 'Admin') {
+        return redirect()->route('home')->with('error', 'Vous n\'avez pas les permissions nécessaires.');
+    }
+    
+    $validated = $request->validate([
+        'role' => 'required|in:Admin,Inscrit',
+    ]);
+    
+    $user = User::findOrFail($id);
+    $user->role = $validated['role'];
+    $user->save();
+    
+    return redirect()->route('admin.users')
+                    ->with('success', 'Le rôle de l\'utilisateur a été mis à jour avec succès.');
+}
+
 
     public function dashboard()
 {
