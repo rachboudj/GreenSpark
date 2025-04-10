@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Project;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +24,13 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        // Récupérer quelques projets actifs ou financés pour les afficher en vedette
+        $projects = Project::whereIn('status', ['active', 'funded'])
+                        ->with('category')
+                        ->latest()
+                        ->take(3) // Limiter à 3 projets en vedette
+                        ->get();
+        
+        return view('home', compact('projects'));
     }
 }
