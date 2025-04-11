@@ -27,7 +27,6 @@ Route::delete('/project-media/{id}', [App\Http\Controllers\ProjectMediaControlle
 
 // Routes pour les catégories
 Route::get('/category/{id}', [ProjectController::class, 'byCategory'])->name('projects.category');
-Route::post('/categories', [ProjectCategoryController::class, 'store'])->name('categories.store');
 
 // Routes pour le tableau de bord admin
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
@@ -36,16 +35,18 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::patch('/projects/{id}/status', [App\Http\Controllers\AdminController::class, 'updateProjectStatus'])->name('update-project-status');
     Route::get('/users', [App\Http\Controllers\AdminController::class, 'users'])->name('users');
     Route::patch('/users/{id}/role', [App\Http\Controllers\AdminController::class, 'updateUserRole'])->name('update-user-role');
+    // Routes pour les catégories
+    Route::get('/categories', [App\Http\Controllers\ProjectCategoryController::class, 'adminIndex'])->name('categories.index');
+    Route::get('/categories/create', [App\Http\Controllers\ProjectCategoryController::class, 'adminCreate'])->name('categories.create');
+    Route::post('/categories', [App\Http\Controllers\ProjectCategoryController::class, 'adminStore'])->name('categories.store');
+    Route::get('/categories/{id}/edit', [App\Http\Controllers\ProjectCategoryController::class, 'adminEdit'])->name('categories.edit');
+    Route::put('/categories/{id}', [App\Http\Controllers\ProjectCategoryController::class, 'adminUpdate'])->name('categories.update');
+    Route::delete('/categories/{id}', [App\Http\Controllers\ProjectCategoryController::class, 'adminDestroy'])->name('categories.destroy');
 });
 
 // Routes pour le tableau de bord utilisateur
 Route::get('/my-projects', [UserController::class, 'myProjects'])->name('my-projects');
 Route::get('/my-contributions', [UserController::class, 'myContributions'])->name('my-contributions');
-
-// Routes pour l'administration des catégories (avec middleware admin)
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::resource('admin/categories', ProjectCategoryController::class);
-});
 
 // Routes pour les contributions
 Route::middleware(['auth'])->group(function () {
