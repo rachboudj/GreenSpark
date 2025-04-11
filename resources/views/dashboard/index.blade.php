@@ -15,6 +15,9 @@
                 <a href="{{ route('admin.users') }}" class="list-group-item list-group-item-action">
                     <i class="bi bi-people"></i> Utilisateurs
                 </a>
+                <a href="{{ route('admin.categories.index') }}" class="list-group-item list-group-item-action">
+                    <i class="bi bi-tags"></i> Catégories
+                </a>
                 <a href="{{ route('projects.index') }}" class="list-group-item list-group-item-action">
                     <i class="bi bi-house"></i> Retour au site
                 </a>
