@@ -27,6 +27,7 @@ Route::delete('/project-media/{id}', [App\Http\Controllers\ProjectMediaControlle
 
 // Routes pour les catégories
 Route::get('/category/{id}', [ProjectController::class, 'byCategory'])->name('projects.category');
+Route::post('/categories', [ProjectCategoryController::class, 'store'])->name('categories.store');
 
 // Routes pour le tableau de bord admin
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
