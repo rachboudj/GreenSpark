@@ -36,13 +36,13 @@
         @forelse($projects as $project)
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
-                    @if($project->cover_image)
-                        <img src="{{ asset('storage/' . $project->cover_image) }}" class="card-img-top" alt="{{ $project->title }}">
-                    @else
-                        <div class="bg-light text-center p-5">
-                            <i class="bi bi-image" style="font-size: 3rem;"></i>
-                        </div>
-                    @endif
+                @if($project->cover_image)
+                    <img src="{{ asset('storage/' . $project->cover_image) }}" class="card-img-top" alt="{{ $project->title }}" style="height: 200px; object-fit: cover;">
+                @else
+                    <div class="bg-light text-center p-5" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-image" style="font-size: 3rem;"></i>
+                    </div>
+                @endif
                     <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <span class="badge bg-secondary">{{ $project->category->name }}</span>

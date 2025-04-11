@@ -29,7 +29,7 @@
             <!-- Image principale -->
             @if($project->cover_image)
                 <div class="mb-4">
-                    <img src="{{ asset('storage/' . $project->cover_image) }}" alt="{{ $project->title }}" class="img-fluid rounded">
+                    <img src="{{ asset('storage/' . $project->cover_image) }}" alt="{{ $project->title }}" class="img-fluid rounded" style="height: 60vh; object-fit: cover;">
                 </div>
             @endif
             
