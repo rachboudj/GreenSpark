@@ -2,63 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ProjectMedia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectMediaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Constructeur avec middleware d'authentification
      */
-    public function index()
+    public function __construct()
     {
-        //
+        $this->middleware('auth');
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
+     * Supprimer un média spécifique
      */
     public function destroy(string $id)
     {
-        //
+        $media = ProjectMedia::findOrFail($id);
+        $project = $media->project;
+        
+        // Vérifier que l'utilisateur est bien le propriétaire du projet
+        if ($project->user_id !== auth()->id()) {
+            return redirect()->back()
+                             ->with('error', 'Vous n\'êtes pas autorisé à supprimer ce média.');
+        }
+        
+        // Supprimer le fichier
+        Storage::disk('public')->delete($media->file_path);
+        
+        // Supprimer l'enregistrement
+        $media->delete();
+        
+        return redirect()->back()
+                         ->with('success', 'Le média a été supprimé avec succès.');
     }
 }
