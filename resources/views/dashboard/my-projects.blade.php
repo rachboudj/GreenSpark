@@ -35,9 +35,12 @@
                             <span class="badge bg-primary mb-2">{{ $project->category->name }}</span>
                             
                             <div class="mb-2">
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: {{ $project->fundingPercentage() }}%;" aria-valuenow="{{ $project->fundingPercentage() }}" aria-valuemin="0" aria-valuemax="100">{{ round($project->fundingPercentage()) }}%</div>
-                                </div>
+                            <div class="progress mb-3">
+                            @php $percentage = ($project->current_amount / $project->funding_goal) * 100; @endphp
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ $percentage }}%">
+                                {{ number_format($percentage, 0) }}%
+                            </div>
+                        </div>
                                 <div class="d-flex justify-content-between mt-1">
                                     <small>{{ number_format($project->current_amount, 0, ',', ' ') }} €</small>
                                     <small>Objectif: {{ number_format($project->funding_goal, 0, ',', ' ') }} €</small>
