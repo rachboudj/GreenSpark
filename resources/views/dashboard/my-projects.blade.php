@@ -40,7 +40,7 @@
                                 </div>
                                 <div class="d-flex justify-content-between mt-1">
                                     <small>{{ number_format($project->current_amount, 0, ',', ' ') }} €</small>
-                                    <small>Objectif: {{ number_format($project->goal_amount, 0, ',', ' ') }} €</small>
+                                    <small>Objectif: {{ number_format($project->funding_goal, 0, ',', ' ') }} €</small>
                                 </div>
                             </div>
                             
