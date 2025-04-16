@@ -48,7 +48,7 @@
                         </div>
                     </div>
                     <div class="card-footer bg-white">
-                        <a href="{{ route('projects.show', $project) }}" class="btn btn-sm btn-primary">Voir le projet</a>
+                        <a href="{{ route('projects.show', $project->slug) }}" class="btn btn-sm btn-primary">Voir le projet</a>
                     </div>
                 </div>
             </div>
